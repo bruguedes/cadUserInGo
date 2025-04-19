@@ -26,6 +26,12 @@ var App = application{
 	data: make(map[uuid.UUID]User), // Inicializa o mapa vazio
 }
 
+var (
+	ErrInvalidUserID = errors.New("invalid user ID")
+	ErrNotFound      = errors.New("not found")
+	ErrInsertUser    = errors.New("failed to insert user")
+)
+
 func (u *User) Insert() (map[string]string, error) {
 
 	App.mu.Lock()
@@ -37,7 +43,7 @@ func (u *User) Insert() (map[string]string, error) {
 	App.data[id] = *u
 
 	if value, exists := App.data[id]; !exists || value != *u {
-		return nil, errors.New("failed to insert user")
+		return nil, ErrInsertUser
 	}
 
 	return map[string]string{
@@ -46,6 +52,32 @@ func (u *User) Insert() (map[string]string, error) {
 		"last_name":  u.LastName,
 		"biography":  u.Biography,
 	}, nil
+}
+
+func GetByID(id string) (map[string]string, error) {
+	App.mu.Lock()
+	defer App.mu.Unlock()
+
+	parsedId, err := uuid.Parse(id)
+
+	if err != nil {
+
+		return nil, ErrInvalidUserID
+	}
+
+	result, exists := App.data[parsedId]
+
+	if !exists {
+		return nil, ErrNotFound
+	}
+
+	return map[string]string{
+		"id":         id,
+		"first_name": result.FirstName,
+		"last_name":  result.LastName,
+		"biography":  result.Biography,
+	}, nil
+
 }
 
 func getUUID(App *application) uuid.UUID {
