@@ -4,6 +4,7 @@ import (
 	"cadUser/model"
 	"cadUser/utils"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -32,7 +33,7 @@ func NewHandler() http.Handler {
 	r.Route("/api/users", func(r chi.Router) {
 		r.Post("/", handleCreateUser)
 		// r.Get("/", handleAllUsers)
-		// r.Get("/{id}", handleGetUser)
+		r.Get("/{id}", handleUserGetById)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
 
