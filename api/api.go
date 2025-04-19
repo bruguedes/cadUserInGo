@@ -75,7 +75,6 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 // }
 
 func handleUserGetById(w http.ResponseWriter, r *http.Request) {
-	
 
 	id := chi.URLParam(r, "id")
 
@@ -96,7 +95,7 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	utils.SendJSON(w, model.Response{Data: user}, http.StatusCreated)
+	utils.SendJSON(w, model.Response{Data: user}, http.StatusOK)
 }
 
 // func handleUpdateUser(w http.ResponseWriter, r *http.Request) {

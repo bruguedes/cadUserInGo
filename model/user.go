@@ -29,7 +29,7 @@ var App = application{
 var (
 	ErrInvalidUserID = errors.New("invalid user ID")
 	ErrNotFound      = errors.New("not found")
-	ErrInsertUser = errors.New("failed to insert user")
+	ErrInsertUser    = errors.New("failed to insert user")
 )
 
 func (u *User) Insert() (map[string]string, error) {
@@ -58,14 +58,14 @@ func GetByID(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
-	parserdId, err := uuid.Parse(id)
+	parsedId, err := uuid.Parse(id)
 
 	if err != nil {
 
 		return nil, ErrInvalidUserID
 	}
 
-	result, exists := App.data[parserdId]
+	result, exists := App.data[parsedId]
 
 	if !exists {
 		return nil, ErrNotFound
