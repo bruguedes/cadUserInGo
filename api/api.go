@@ -5,6 +5,7 @@ import (
 	"cadUser/utils"
 	"encoding/json"
 	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -32,8 +33,8 @@ func NewHandler() http.Handler {
 
 	r.Route("/api/users", func(r chi.Router) {
 		r.Post("/", handleCreateUser)
-		r.Get("/", handleFindAllUsers)
-		// r.Get("/{id}", handleGetUser)
+		r.Get("/", handleFindAllUsers)	
+		r.Get("/{id}", handleUserGetById)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
 
@@ -104,9 +105,29 @@ func handleFindAllUsers(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSON(w, model.Response{Data: users}, http.StatusOK)
 }
 
-// func handleGetUser(w http.ResponseWriter, r *http.Request) {
-// 	return
-// }
+func handleUserGetById(w http.ResponseWriter, r *http.Request) {
+
+	id := chi.URLParam(r, "id")
+
+	user, err := model.GetByID(id)
+
+	if err != nil {
+		if errors.Is(err, model.ErrInvalidUserID) {
+			utils.SendJSON(w, model.Response{Error: "invalid user ID"}, http.StatusBadRequest)
+			return
+		}
+		if errors.Is(err, model.ErrNotFound) {
+			utils.SendJSON(w, model.Response{Message: "The user with the specified ID does not exist"}, http.StatusNotFound)
+			return
+		}
+
+		utils.SendJSON(w, model.Response{Message: "The user information could not be retrieved"}, http.StatusInternalServerError)
+		return
+
+	}
+
+	utils.SendJSON(w, model.Response{Data: user}, http.StatusOK)
+}
 
 // func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 // 	return
