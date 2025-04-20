@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -35,6 +36,8 @@ func NewHandler() http.Handler {
 		r.Post("/", handleCreateUser)
 		r.Get("/", handleFindAllUsers)	
 		r.Get("/{id}", handleUserGetById)
+		r.Get("/", handleFindAllUsers)
+		// r.Get("/{id}", handleGetUser)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
 

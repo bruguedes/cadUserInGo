@@ -82,10 +82,11 @@ func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 	return users, nil
 
 func GetByID(id string) (map[string]string, error) {
+func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
-	parsedId, err := uuid.Parse(id)
+	users := make([]map[string]string, 0)
 
 	if err != nil {
 
@@ -106,6 +107,25 @@ func GetByID(id string) (map[string]string, error) {
 	}, nil
 
 
+	if len(App.data) == 0 {
+		return users, nil
+	}
+
+	if len(params) == 0 {
+		for key, value := range App.data {
+			buildUser := map[string]string{
+				"id":         key.String(),
+				"first_name": value.FirstName,
+				"last_name":  value.LastName,
+				"biography":  value.Biography,
+			}
+
+			users = append(users, buildUser)
+
+		}
+
+	}
+	return users, nil
 }
 
 func getUUID(App *application) uuid.UUID {
