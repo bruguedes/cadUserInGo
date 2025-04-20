@@ -4,6 +4,7 @@ import (
 	"cadUser/model"
 	"cadUser/utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -31,7 +32,7 @@ func NewHandler() http.Handler {
 
 	r.Route("/api/users", func(r chi.Router) {
 		r.Post("/", handleCreateUser)
-		// r.Get("/", handleAllUsers)
+		r.Get("/", handleFindAllUsers)
 		// r.Get("/{id}", handleGetUser)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
@@ -69,9 +70,39 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func handleAllUsers(w http.ResponseWriter, r *http.Request) {
-// 	return
-// }
+func handleFindAllUsers(w http.ResponseWriter, r *http.Request) {
+
+	//busca uma chave especifica na query string
+	// e retorna o valor dela
+	filtersParam := r.URL.Query().Get("filters")
+
+	fmt.Println(filtersParam)
+
+	var userParams map[string]string
+
+	if filtersParam != "" {
+
+		if err := json.Unmarshal([]byte(filtersParam), &userParams); err != nil {
+			utils.SendJSON(w, model.Response{Error: "invalid filters"}, http.StatusBadRequest)
+			return
+		}
+	}
+
+	fmt.Println(userParams)
+
+	users, err := model.FindAllUsers(userParams)
+	if err != nil {
+		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
+		return
+	}
+
+	// if len(users) == 0 {
+	// 	utils.SendJSON(w, model.Response{Error: "no users found"}, http.StatusNotFound)
+	// 	return
+	// }
+
+	utils.SendJSON(w, model.Response{Data: users}, http.StatusOK)
+}
 
 // func handleGetUser(w http.ResponseWriter, r *http.Request) {
 // 	return

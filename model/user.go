@@ -48,6 +48,33 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
+func FindAllUsers(params map[string]string) ([]map[string]string, error) {
+	App.mu.Lock()
+	defer App.mu.Unlock()
+
+	users := make([]map[string]string, 0)
+
+	if len(App.data) == 0 {
+		return users, nil
+	}
+
+	if len(params) == 0 {
+		for key, value := range App.data {
+			buildUser := map[string]string{
+				"id":         key.String(),
+				"first_name": value.FirstName,
+				"last_name":  value.LastName,
+				"biography":  value.Biography,
+			}
+
+			users = append(users, buildUser)
+
+		}
+
+	}
+	return users, nil
+}
+
 func getUUID(App *application) uuid.UUID {
 	// Verifica se o ID já existe no mapa
 	// Se o ID já existe, gera um novo ID
