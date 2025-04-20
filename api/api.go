@@ -4,7 +4,6 @@ import (
 	"cadUser/model"
 	"cadUser/utils"
 	"encoding/json"
-	"fmt"
 	"errors"
 	"fmt"
 	"net/http"
@@ -34,9 +33,8 @@ func NewHandler() http.Handler {
 
 	r.Route("/api/users", func(r chi.Router) {
 		r.Post("/", handleCreateUser)
-		r.Get("/", handleFindAllUsers)	
+		r.Get("/", handleGetAllUsers)
 		r.Get("/{id}", handleUserGetById)
-		r.Get("/", handleFindAllUsers)
 		// r.Get("/{id}", handleGetUser)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
@@ -74,13 +72,11 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handleFindAllUsers(w http.ResponseWriter, r *http.Request) {
+func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	//busca uma chave especifica na query string
 	// e retorna o valor dela
 	filtersParam := r.URL.Query().Get("filters")
-
-	fmt.Println(filtersParam)
 
 	var userParams map[string]string
 
@@ -90,6 +86,7 @@ func handleFindAllUsers(w http.ResponseWriter, r *http.Request) {
 			utils.SendJSON(w, model.Response{Error: "invalid filters"}, http.StatusBadRequest)
 			return
 		}
+
 	}
 
 	fmt.Println(userParams)

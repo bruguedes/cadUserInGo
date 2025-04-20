@@ -21,6 +21,8 @@ type application struct {
 	data map[uuid.UUID]User
 }
 
+
+
 var App = application{
 	mu:   sync.Mutex{},             // Inicializa o mutex
 	data: make(map[uuid.UUID]User), // Inicializa o mapa vazio
@@ -54,7 +56,6 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
-
 func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
@@ -67,26 +68,49 @@ func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 
 	if len(params) == 0 {
 		for key, value := range App.data {
-			buildUser := map[string]string{
-				"id":         key.String(),
-				"first_name": value.FirstName,
-				"last_name":  value.LastName,
-				"biography":  value.Biography,
-			}
 
-			users = append(users, buildUser)
+			users = append(users, buildUser(key, value))
 
 		}
 
+		return users, nil
 	}
+
+	if params["first_name"] != "" && params["last_name"] != "" {
+		for key, value := range App.data {
+			if value.FirstName == params["first_name"] && value.LastName == params["last_name"] {
+				users = append(users, buildUser(key, value))
+				continue
+			}
+			return users, nil
+		}
+	}
+
+	if params["first_name"] != "" || params["last_name"] != "" {
+		for key, value := range App.data {
+			if value.FirstName == params["first_name"] {
+				users = append(users, buildUser(key, value))
+				continue
+			}
+
+			if value.LastName == params["last_name"] {
+
+				users = append(users, buildUser(key, value))
+				continue
+			}
+		}
+
+	}
+
 	return users, nil
 
+}
+
 func GetByID(id string) (map[string]string, error) {
-func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
-	users := make([]map[string]string, 0)
+	parsedId, err := uuid.Parse(id)
 
 	if err != nil {
 
@@ -106,26 +130,6 @@ func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 		"biography":  result.Biography,
 	}, nil
 
-
-	if len(App.data) == 0 {
-		return users, nil
-	}
-
-	if len(params) == 0 {
-		for key, value := range App.data {
-			buildUser := map[string]string{
-				"id":         key.String(),
-				"first_name": value.FirstName,
-				"last_name":  value.LastName,
-				"biography":  value.Biography,
-			}
-
-			users = append(users, buildUser)
-
-		}
-
-	}
-	return users, nil
 }
 
 func getUUID(App *application) uuid.UUID {
@@ -141,4 +145,13 @@ func getUUID(App *application) uuid.UUID {
 		// Caso contrário, o loop continua gerando novos UUIDs
 	}
 
+}
+
+func buildUser(id uuid.UUID, user User) map[string]string {
+	return map[string]string{
+		"id":         id.String(),
+		"first_name": user.FirstName,
+		"last_name":  user.LastName,
+		"biography":  user.Biography,
+	}
 }
