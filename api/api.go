@@ -135,7 +135,7 @@ func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 
 		default:
-			utils.SendJSON(w, model.Response{Message: "The user information could not be retrieved"}, http.StatusInternalServerError)
+			utils.SendJSON(w, model.Response{Message: "The user could not be deleted"}, http.StatusInternalServerError)
 			return
 		}
 
