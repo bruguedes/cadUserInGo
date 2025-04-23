@@ -5,7 +5,6 @@ import (
 	"cadUser/utils"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -89,9 +88,7 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	fmt.Println(userParams)
-
-	users, err := model.FindAllUsers(userParams)
+	users, err := model.FindAll(userParams)
 	if err != nil {
 		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
 		return

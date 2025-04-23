@@ -55,7 +55,7 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
-func FindAllUsers(params map[string]string) ([]map[string]string, error) {
+func FindAll(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
