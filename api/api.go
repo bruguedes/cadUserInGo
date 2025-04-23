@@ -32,8 +32,9 @@ func NewHandler() http.Handler {
 
 	r.Route("/api/users", func(r chi.Router) {
 		r.Post("/", handleCreateUser)
-		// r.Get("/", handleAllUsers)
+		r.Get("/", handleGetAllUsers)
 		r.Get("/{id}", handleUserGetById)
+		// r.Get("/{id}", handleGetUser)
 		// r.Put("/{id}", handleUpdateUser)
 		// r.Delete("/{id}", handleDeleteUser)
 
@@ -53,16 +54,16 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Valida os campos da struct User
 	if err := validate.Struct(user); err != nil {
-		msg := "Please provide FirstName LastName and bio for the user"
 
-		utils.SendJSON(w, model.Response{Message: msg}, http.StatusBadRequest)
+		utils.SendJSON(w, model.Response{Error: "invalid input: " + err.Error()}, http.StatusBadRequest)
 		return
 	}
 
 	result, err := user.Insert()
 
 	if err != nil {
-		utils.SendJSON(w, model.Response{Error: "failed to insert user"}, http.StatusInternalServerError)
+
+		utils.SendJSON(w, model.Response{Error: "failed to insert user: " + err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
@@ -70,9 +71,31 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// func handleAllUsers(w http.ResponseWriter, r *http.Request) {
-// 	return
-// }
+func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
+
+	//busca uma chave especifica na query string
+	// e retorna o valor dela
+	filtersParam := r.URL.Query().Get("filters")
+
+	var userParams map[string]string
+
+	if filtersParam != "" {
+
+		if err := json.Unmarshal([]byte(filtersParam), &userParams); err != nil {
+			utils.SendJSON(w, model.Response{Error: "invalid filters"}, http.StatusBadRequest)
+			return
+		}
+
+	}
+
+	users, err := model.FindAll(userParams)
+	if err != nil {
+		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
+		return
+	}
+
+	utils.SendJSON(w, model.Response{Data: users}, http.StatusOK)
+}
 
 func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 

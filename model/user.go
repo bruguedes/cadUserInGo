@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -54,6 +55,60 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
+func FindAll(params map[string]string) ([]map[string]string, error) {
+	App.mu.Lock()
+	defer App.mu.Unlock()
+
+	users := make([]map[string]string, 0)
+
+	if len(App.data) == 0 {
+		return users, nil
+	}
+
+	if len(params) == 0 {
+		for key, value := range App.data {
+
+			users = append(users, buildUser(key, value))
+
+		}
+
+		return users, nil
+	}
+
+	if params["first_name"] != "" && params["last_name"] != "" {
+
+		for key, value := range App.data {
+			if strings.EqualFold(value.FirstName, params["first_name"]) && strings.EqualFold(value.LastName, params["last_name"]) {
+				users = append(users, buildUser(key, value))
+				continue
+			}
+		}
+		return users, nil
+	}
+
+	if params["first_name"] != "" || params["last_name"] != "" {
+
+		for key, value := range App.data {
+
+			if strings.EqualFold(value.FirstName, params["first_name"]) {
+
+				users = append(users, buildUser(key, value))
+				continue
+			}
+
+			if strings.EqualFold(value.LastName, params["last_name"]) {
+
+				users = append(users, buildUser(key, value))
+				continue
+			}
+		}
+
+	}
+
+	return users, nil
+
+}
+
 func GetByID(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
@@ -93,4 +148,13 @@ func getUUID(App *application) uuid.UUID {
 		// Caso contrário, o loop continua gerando novos UUIDs
 	}
 
+}
+
+func buildUser(id uuid.UUID, user User) map[string]string {
+	return map[string]string{
+		"id":         id.String(),
+		"first_name": user.FirstName,
+		"last_name":  user.LastName,
+		"biography":  user.Biography,
+	}
 }
