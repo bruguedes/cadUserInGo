@@ -54,9 +54,8 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Valida os campos da struct User
 	if err := validate.Struct(user); err != nil {
-		msg := "Please provide FirstName LastName and bio for the user"
 
-		utils.SendJSON(w, model.Response{Message: msg}, http.StatusBadRequest)
+		utils.SendJSON(w, model.Response{Error: "invalid input: " + err.Error()}, http.StatusBadRequest)
 		return
 	}
 
@@ -64,7 +63,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 
-		utils.SendJSON(w, model.Response{Error: "failed to insert user"}, http.StatusInternalServerError)
+		utils.SendJSON(w, model.Response{Error: "failed to insert user:" + err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
