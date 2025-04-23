@@ -35,7 +35,7 @@ func NewHandler() http.Handler {
 		r.Get("/", handleGetAllUsers)
 		r.Get("/{id}", handleUserGetById)
 		r.Delete("/{id}", handleDeleteUser)
-		// r.Put("/{id}", handleUpdateUser)
+		r.Put("/{id}", handleUpdateUser)
 
 	})
 
@@ -71,6 +71,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
+	user := model.User{}
 
 	//busca uma chave especifica na query string
 	// e retorna o valor dela
@@ -87,7 +88,7 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	users, err := model.FindAll(userParams)
+	users, err := user.FindAll(userParams)
 	if err != nil {
 		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
 		return
@@ -97,10 +98,11 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUserGetById(w http.ResponseWriter, r *http.Request) {
+	user := model.User{}
 
 	id := chi.URLParam(r, "id")
 
-	user, err := model.GetByID(id)
+	userData, err := user.GetByID(id)
 
 	if err != nil {
 		if errors.Is(err, model.ErrInvalidUserID) {
@@ -117,13 +119,15 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	utils.SendJSON(w, model.Response{Data: user}, http.StatusOK)
+	utils.SendJSON(w, model.Response{Data: userData}, http.StatusOK)
 }
 
 func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	deletedUser, err := model.Delete(id)
+	user := model.User{}
+
+	deletedUser, err := user.Delete(id)
 
 	if err != nil {
 		switch {
@@ -144,6 +148,39 @@ func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSON(w, model.Response{Data: deletedUser}, http.StatusOK)
 }
 
-// func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
-// 	return
-// }
+func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	user := &model.User{}
+
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
+		utils.SendJSON(w, model.Response{Error: "invalid body"}, http.StatusUnprocessableEntity)
+		return
+	}
+
+	// Valida os campos da struct User
+	if err := validate.Struct(user); err != nil {
+
+		utils.SendJSON(w, model.Response{Error: "invalid input: " + err.Error()}, http.StatusBadRequest)
+		return
+	}
+
+	updatedUser, err := user.Update(id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrInvalidUserID):
+			utils.SendJSON(w, model.Response{Error: "invalid user ID"}, http.StatusBadRequest)
+			return
+		case errors.Is(err, model.ErrNotFound):
+			utils.SendJSON(w, model.Response{Message: "The user with the specified ID does not exist"}, http.StatusNotFound)
+			return
+
+		default:
+			utils.SendJSON(w, model.Response{Message: "The user could not be updated"}, http.StatusInternalServerError)
+		}
+
+	}
+
+	utils.SendJSON(w, model.Response{Data: updatedUser}, http.StatusOK)
+}

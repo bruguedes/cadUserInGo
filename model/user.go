@@ -55,7 +55,7 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
-func FindAll(params map[string]string) ([]map[string]string, error) {
+func (u *User) FindAll(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
@@ -109,7 +109,7 @@ func FindAll(params map[string]string) ([]map[string]string, error) {
 
 }
 
-func GetByID(id string) (map[string]string, error) {
+func (u *User) GetByID(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
@@ -135,7 +135,7 @@ func GetByID(id string) (map[string]string, error) {
 
 }
 
-func Delete(id string) (map[string]string, error) {
+func (u *User) Delete(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
@@ -155,6 +155,29 @@ func Delete(id string) (map[string]string, error) {
 	delete(App.data, parsedId)
 
 	return buildUser(parsedId, result), nil
+
+}
+func (u *User) Update(id string) (map[string]string, error) {
+	App.mu.Lock()
+	defer App.mu.Unlock()
+
+	parsedId, err := uuid.Parse(id)
+
+	if err != nil {
+
+		return nil, ErrInvalidUserID
+	}
+
+	_, exists := App.data[parsedId]
+
+	if !exists {
+		return nil, ErrNotFound
+	}
+
+	// Atualiza os campos do usuário existente
+	App.data[parsedId] = *u
+
+	return buildUser(parsedId, *u), nil
 
 }
 
