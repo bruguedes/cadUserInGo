@@ -63,7 +63,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 
-		utils.SendJSON(w, model.Response{Error: "failed to insert user:" + err.Error()}, http.StatusInternalServerError)
+		utils.SendJSON(w, model.Response{Error: "failed to insert user: " + err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
