@@ -55,7 +55,7 @@ func (u *User) Insert() (map[string]string, error) {
 	}, nil
 }
 
-func FindAll(params map[string]string) ([]map[string]string, error) {
+func (u *User) FindAll(params map[string]string) ([]map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
@@ -109,7 +109,7 @@ func FindAll(params map[string]string) ([]map[string]string, error) {
 
 }
 
-func GetByID(id string) (map[string]string, error) {
+func (u *User) GetByID(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 
@@ -135,7 +135,7 @@ func GetByID(id string) (map[string]string, error) {
 
 }
 
-func Delete(id string) (map[string]string, error) {
+func (u *User) Delete(id string) (map[string]string, error) {
 	App.mu.Lock()
 	defer App.mu.Unlock()
 

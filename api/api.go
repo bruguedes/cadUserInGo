@@ -71,6 +71,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
+	user := model.User{}
 
 	//busca uma chave especifica na query string
 	// e retorna o valor dela
@@ -87,7 +88,7 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	users, err := model.FindAll(userParams)
+	users, err := user.FindAll(userParams)
 	if err != nil {
 		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
 		return
@@ -97,10 +98,11 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleUserGetById(w http.ResponseWriter, r *http.Request) {
+	user := model.User{}
 
 	id := chi.URLParam(r, "id")
 
-	user, err := model.GetByID(id)
+	result, err := user.GetByID(id)
 
 	if err != nil {
 		if errors.Is(err, model.ErrInvalidUserID) {
@@ -117,13 +119,15 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	utils.SendJSON(w, model.Response{Data: user}, http.StatusOK)
+	utils.SendJSON(w, model.Response{Data: result}, http.StatusOK)
 }
 
 func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	deletedUser, err := model.Delete(id)
+	user := model.User{}
+
+	deletedUser, err := user.Delete(id)
 
 	if err != nil {
 		switch {
