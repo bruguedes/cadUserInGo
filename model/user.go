@@ -135,6 +135,29 @@ func GetByID(id string) (map[string]string, error) {
 
 }
 
+func Delete(id string) (map[string]string, error) {
+	App.mu.Lock()
+	defer App.mu.Unlock()
+
+	parsedId, err := uuid.Parse(id)
+
+	if err != nil {
+
+		return nil, ErrInvalidUserID
+	}
+
+	result, exists := App.data[parsedId]
+
+	if !exists {
+		return nil, ErrNotFound
+	}
+
+	delete(App.data, parsedId)
+
+	return buildUser(parsedId, result), nil
+
+}
+
 func getUUID(App *application) uuid.UUID {
 	// Verifica se o ID já existe no mapa
 	// Se o ID já existe, gera um novo ID

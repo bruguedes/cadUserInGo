@@ -17,9 +17,9 @@ Este desafio é opcional e não possui correção oficial, mas é uma excelente 
 | Método | URL               | Descrição                                                                 | Status       |
 |--------|--------------------|---------------------------------------------------------------------------|--------------|
 | POST   | /api/users         | Cria um usuário usando as informações enviadas no corpo da requisição.   | ✔ Implementado |
-| GET    | /api/users         | Retorna um array de usuários.                                            | ✘ Não implementado |
+| GET    | /api/users         | Retorna um array de usuários.                                            | ✔ Implementado |
 | GET    | /api/users/:id     | Retorna o objeto do usuário com o id especificado.                       | ✔ Implementado |
-| DELETE | /api/users/:id     | Remove o usuário com o id especificado e retorna o usuário deletado.     | ✘ Não implementado |
+| DELETE | /api/users/:id     | Remove o usuário com o id especificado e retorna o usuário deletado.     | ✔ Implementado |
 | PUT    | /api/users/:id     | Atualiza o usuário com o id especificado usando dados do corpo da requisição. Retorna o usuário modificado. | ✘ Não implementado |
 
 ---
