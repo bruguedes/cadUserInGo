@@ -153,7 +153,7 @@ func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	user := &model.User{}
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		utils.SendJSON(w, model.Response{Error: "invalid body"}, http.StatusUnprocessableEntity)
 		return
 	}
