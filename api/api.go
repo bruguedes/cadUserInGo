@@ -102,7 +102,7 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 
-	result, err := user.GetByID(id)
+	userData, err := user.GetByID(id)
 
 	if err != nil {
 		if errors.Is(err, model.ErrInvalidUserID) {
@@ -119,7 +119,7 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	utils.SendJSON(w, model.Response{Data: result}, http.StatusOK)
+	utils.SendJSON(w, model.Response{Data: userData}, http.StatusOK)
 }
 
 func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
