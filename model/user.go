@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -20,8 +21,6 @@ type application struct {
 	mu   sync.Mutex // Mutex para controle de concorrência
 	data map[uuid.UUID]User
 }
-
-
 
 var App = application{
 	mu:   sync.Mutex{},             // Inicializa o mutex
@@ -77,23 +76,27 @@ func FindAllUsers(params map[string]string) ([]map[string]string, error) {
 	}
 
 	if params["first_name"] != "" && params["last_name"] != "" {
+
 		for key, value := range App.data {
-			if value.FirstName == params["first_name"] && value.LastName == params["last_name"] {
+			if strings.EqualFold(value.FirstName, params["first_name"]) && strings.EqualFold(value.LastName, params["last_name"]) {
 				users = append(users, buildUser(key, value))
 				continue
 			}
-			return users, nil
 		}
+		return users, nil
 	}
 
 	if params["first_name"] != "" || params["last_name"] != "" {
+
 		for key, value := range App.data {
-			if value.FirstName == params["first_name"] {
+
+			if strings.EqualFold(value.FirstName, params["first_name"]) {
+
 				users = append(users, buildUser(key, value))
 				continue
 			}
 
-			if value.LastName == params["last_name"] {
+			if strings.EqualFold(value.LastName, params["last_name"]) {
 
 				users = append(users, buildUser(key, value))
 				continue
