@@ -34,9 +34,8 @@ func NewHandler() http.Handler {
 		r.Post("/", handleCreateUser)
 		r.Get("/", handleGetAllUsers)
 		r.Get("/{id}", handleUserGetById)
-		// r.Get("/{id}", handleGetUser)
+		r.Delete("/{id}", handleDeleteUser)
 		// r.Put("/{id}", handleUpdateUser)
-		// r.Delete("/{id}", handleDeleteUser)
 
 	})
 
@@ -121,9 +120,30 @@ func handleUserGetById(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSON(w, model.Response{Data: user}, http.StatusOK)
 }
 
+func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	deletedUser, err := model.Delete(id)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrInvalidUserID):
+			utils.SendJSON(w, model.Response{Error: "invalid user ID"}, http.StatusBadRequest)
+			return
+		case errors.Is(err, model.ErrNotFound):
+			utils.SendJSON(w, model.Response{Message: "The user with the specified ID does not exist"}, http.StatusNotFound)
+			return
+
+		default:
+			utils.SendJSON(w, model.Response{Message: "The user information could not be retrieved"}, http.StatusInternalServerError)
+			return
+		}
+
+	}
+
+	utils.SendJSON(w, model.Response{Data: deletedUser}, http.StatusOK)
+}
+
 // func handleUpdateUser(w http.ResponseWriter, r *http.Request) {
-// 	return
-// }
-// func handleDeleteUser(w http.ResponseWriter, r *http.Request) {
 // 	return
 // }
