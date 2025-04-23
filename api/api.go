@@ -63,6 +63,7 @@ func handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	result, err := user.Insert()
 
 	if err != nil {
+
 		utils.SendJSON(w, model.Response{Error: "failed to insert user"}, http.StatusInternalServerError)
 		return
 	}
@@ -93,11 +94,6 @@ func handleGetAllUsers(w http.ResponseWriter, r *http.Request) {
 		utils.SendJSON(w, model.Response{Error: "failed to find users"}, http.StatusInternalServerError)
 		return
 	}
-
-	// if len(users) == 0 {
-	// 	utils.SendJSON(w, model.Response{Error: "no users found"}, http.StatusNotFound)
-	// 	return
-	// }
 
 	utils.SendJSON(w, model.Response{Data: users}, http.StatusOK)
 }
